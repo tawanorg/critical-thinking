@@ -150,6 +150,30 @@ digraph critical_thinking {
 | `project_memory_add_note` | Add categorized notes that persist |
 | `session_search` | Search prior sessions for relevant context |
 
+#### Browser Automation (For Live Testing)
+| Tool | When to Use |
+|------|-------------|
+| `firecrawl_interact` | Click, fill forms, test live behavior |
+| `firecrawl_agent` | Autonomous research across multiple sites |
+| `firecrawl_crawl` | Crawl entire documentation sites |
+| `firecrawl_extract` | Extract structured data with JSON schema |
+
+#### Google Workspace (Business Context)
+| Tool | When to Use |
+|------|-------------|
+| `Gmail__search_threads` | Find email discussions about the requirement |
+| `Gmail__get_thread` | Read full context of conversations |
+| `Google_Drive__read_file_content` | Read specs, docs, spreadsheets |
+| `Google_Drive__search_files` | Find relevant documentation |
+| `Google_Calendar__list_events` | Check deadlines, stakeholder availability |
+
+#### Filesystem Analysis
+| Tool | When to Use |
+|------|-------------|
+| `directory_tree` | Visualize project structure |
+| `read_multiple_files` | Read many files simultaneously |
+| `list_directory_with_sizes` | Find large files, analyze codebase |
+
 ### Power Tools by Analysis Step
 
 | Step | Tools to Use | Purpose |

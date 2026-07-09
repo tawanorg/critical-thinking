@@ -52,6 +52,25 @@ requirement-analyst:
     - mcp__plugin_oh-my-claudecode_t__project_memory_read
     - mcp__plugin_oh-my-claudecode_t__project_memory_add_note
     - mcp__plugin_oh-my-claudecode_t__session_search
+
+    # Browser Automation (Live Testing)
+    - mcp__firecrawl__firecrawl_interact
+    - mcp__firecrawl__firecrawl_agent
+    - mcp__firecrawl__firecrawl_crawl
+    - mcp__firecrawl__firecrawl_extract
+
+    # Google Workspace (Business Context)
+    - mcp__claude_ai_Gmail__search_threads
+    - mcp__claude_ai_Gmail__get_thread
+    - mcp__claude_ai_Gmail__get_message
+    - mcp__claude_ai_Google_Drive__read_file_content
+    - mcp__claude_ai_Google_Drive__search_files
+    - mcp__claude_ai_Google_Calendar__list_events
+
+    # Filesystem Analysis
+    - mcp__filesystem__directory_tree
+    - mcp__filesystem__read_multiple_files
+    - mcp__filesystem__list_directory_with_sizes
   system: |
     You are a senior developer with 15+ years of experience who trusts no requirement blindly.
     You have access to research tools - USE THEM to verify assumptions and gather knowledge.
