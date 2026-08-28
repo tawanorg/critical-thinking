@@ -29,27 +29,17 @@ This skill transforms how you approach any technical task by applying a systemat
 - Stakeholder communication templates
 
 ### Research Capabilities
-- Web research (Firecrawl, WebSearch, WebFetch)
-- GitHub research (code search, issue search, file contents)
-- Documentation parsing (PDFs, Word, Excel)
+- Version-correct library docs (Context7)
+- General web research (WebSearch, WebFetch)
+- GitHub research through the `gh` CLI
 
-### Code Analysis (LSP)
-- Project-wide diagnostics
-- Symbol navigation and references
-- Type information and documentation
+### Code Analysis (Serena)
+- Symbol navigation: definitions, references, implementations
+- Language-server diagnostics per file or per symbol
+- Symbol-level edits and project-wide rename
 
-### Structural Code Search (AST)
-- Pattern-based code search
-- Safe refactoring across files
-
-### Complex Reasoning
-- Sequential thinking with revision capability
-- Python REPL for calculations and analysis
-
-### Memory & Context
-- Project memory persistence
-- Session search for historical context
-- Knowledge graph storage
+### Memory & Context (Serena)
+- Project memories that survive between sessions
 
 ## Installation
 
@@ -89,11 +79,10 @@ The skill follows the [agentskills.io specification](https://agentskills.io/spec
 ### Use the Requirement Analyst Agent
 
 ```bash
-# Via OMC Team
-/team requirement-analyst "Analyze: Users should be able to export their data as CSV"
-
-# Via Task Tool
-Use Task tool with subagent_type: "oh-my-claudecode:architect"
+# Delegate the analysis to a subagent
+Use the Agent tool with subagent_type "general-purpose" and a prompt of
+"Apply the critical-developer-mindset skill to: Users should be able to
+export their data as CSV"
 ```
 
 ## The Critical Developer Creed
@@ -121,11 +110,17 @@ Use Task tool with subagent_type: "oh-my-claudecode:architect"
 
 ## Requirements
 
-For full functionality, ensure these MCP servers are configured:
-- `firecrawl` - Web search and scraping
-- `github` - GitHub API access
-- `memory` - Knowledge graph
-- `oh-my-claudecode` - LSP, AST, Python REPL, project memory
+Two MCP servers, both optional — the framework works without them, but the
+tool tables in `SKILL.md` assume they are present:
+
+| Server | Provides | Install |
+|---|---|---|
+| [serena](https://github.com/oraios/serena) | Symbol-level code navigation and editing over a real language server | `uv tool install serena-agent`, then `claude mcp add serena -s user -- serena start-mcp-server --context ide-assistant` |
+| [context7](https://github.com/upstash/context7) | Version-correct library documentation | `claude mcp add context7 -s user --transport http https://mcp.context7.com/mcp` |
+
+GitHub research goes through the `gh` CLI rather than an MCP server. Google
+Workspace tools come from the connectors on your Claude account, not from
+anything installed here.
 
 ## License
 

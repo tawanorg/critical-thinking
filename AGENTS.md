@@ -16,61 +16,37 @@ requirement-analyst:
     - Grep
     - Glob
 
-    # Web & Documentation Research
+    # Documentation & the web
     - WebSearch
     - WebFetch
-    - firecrawl_search
-    - firecrawl_scrape
-    - firecrawl_parse
+    - mcp__context7__resolve-library-id
+    - mcp__context7__query-docs
 
-    # GitHub Research
-    - mcp__github__search_code
-    - mcp__github__search_issues
-    - mcp__github__get_file_contents
-    - mcp__github__list_commits
+    # GitHub research runs through the gh CLI, not an MCP server
+    - Bash
 
-    # Code Analysis (LSP) - Understand existing code
-    - mcp__plugin_oh-my-claudecode_t__lsp_diagnostics
-    - mcp__plugin_oh-my-claudecode_t__lsp_diagnostics_directory
-    - mcp__plugin_oh-my-claudecode_t__lsp_hover
-    - mcp__plugin_oh-my-claudecode_t__lsp_goto_definition
-    - mcp__plugin_oh-my-claudecode_t__lsp_find_references
-    - mcp__plugin_oh-my-claudecode_t__lsp_document_symbols
-    - mcp__plugin_oh-my-claudecode_t__lsp_workspace_symbols
+    # Reading code by symbol (Serena)
+    - mcp__serena__get_symbols_overview
+    - mcp__serena__find_symbol
+    - mcp__serena__find_referencing_symbols
+    - mcp__serena__find_implementations
+    - mcp__serena__find_declaration
+    - mcp__serena__get_diagnostics_for_file
+    - mcp__serena__get_diagnostics_for_symbol
+    - mcp__serena__search_for_pattern
 
-    # Structural Code Search (AST)
-    - mcp__plugin_oh-my-claudecode_t__ast_grep_search
+    # Memory that survives between sessions (Serena)
+    - mcp__serena__write_memory
+    - mcp__serena__read_memory
+    - mcp__serena__list_memories
 
-    # Complex Reasoning
-    - mcp__sequential-thinking__sequentialthinking
-    - mcp__plugin_oh-my-claudecode_t__python_repl
-
-    # Memory & Context
-    - mcp__memory__create_entities
-    - mcp__memory__add_observations
-    - mcp__memory__search_nodes
-    - mcp__plugin_oh-my-claudecode_t__project_memory_read
-    - mcp__plugin_oh-my-claudecode_t__project_memory_add_note
-    - mcp__plugin_oh-my-claudecode_t__session_search
-
-    # Browser Automation (Live Testing)
-    - mcp__firecrawl__firecrawl_interact
-    - mcp__firecrawl__firecrawl_agent
-    - mcp__firecrawl__firecrawl_crawl
-    - mcp__firecrawl__firecrawl_extract
-
-    # Google Workspace (Business Context)
+    # Google Workspace (business context)
     - mcp__claude_ai_Gmail__search_threads
     - mcp__claude_ai_Gmail__get_thread
     - mcp__claude_ai_Gmail__get_message
     - mcp__claude_ai_Google_Drive__read_file_content
     - mcp__claude_ai_Google_Drive__search_files
     - mcp__claude_ai_Google_Calendar__list_events
-
-    # Filesystem Analysis
-    - mcp__filesystem__directory_tree
-    - mcp__filesystem__read_multiple_files
-    - mcp__filesystem__list_directory_with_sizes
   system: |
     You are a senior developer with 15+ years of experience who trusts no requirement blindly.
     You have access to research tools - USE THEM to verify assumptions and gather knowledge.
@@ -146,13 +122,13 @@ doc-researcher:
   description: Documentation research specialist - finds official docs, best practices, and known issues
   model: sonnet
   tools:
-    - firecrawl_search
-    - firecrawl_scrape
+    - mcp__context7__resolve-library-id
+    - mcp__context7__query-docs
+    - WebSearch
     - WebFetch
-    - mcp__github__search_code
-    - mcp__github__get_file_contents
-    - mcp__memory__create_entities
-    - mcp__memory__add_observations
+    - Bash                      # gh search code, gh api
+    - mcp__serena__write_memory
+    - mcp__serena__read_memory
   system: |
     You research official documentation and best practices.
 
@@ -177,10 +153,11 @@ security-researcher:
   description: Security research specialist - checks OWASP, CVEs, security advisories
   model: sonnet
   tools:
-    - firecrawl_search
-    - firecrawl_scrape
     - WebSearch
-    - mcp__github__search_issues
+    - WebFetch
+    - mcp__context7__query-docs
+    - Bash                      # gh search issues, gh api for advisories
+    - mcp__serena__get_diagnostics_for_file
   system: |
     You research security implications of technical decisions.
 
@@ -199,24 +176,24 @@ security-researcher:
 
 ## Usage Examples
 
-### Invoke via OMC Team
-```bash
-# Full requirement analysis with research
-/team requirement-analyst "Analyze: Users should be able to export their data as CSV"
+### Invoke as a Local Subagent
+The three agents above are definitions, not installed agents. To use one, save
+it as `~/.claude/agents/<name>.md` with the `description` and `tools` from its
+block, then dispatch:
 
-# Documentation research only
-/team doc-researcher "Research Stripe webhook best practices"
-
-# Security-focused analysis
-/team security-researcher "Review security implications of user file uploads"
+```
+Use the Agent tool with subagent_type "requirement-analyst" and the prompt
+"Analyze: Users should be able to export their data as CSV"
 ```
 
-### Invoke via Task Tool
+Or skip the agent entirely and invoke the skill directly in your session —
+for a single requirement that is usually enough.
+
+### Invoke via a Subagent
 ```
-Use the Task tool with:
-- subagent_type: "oh-my-claudecode:architect"
-- model: opus
-- prompt: "Apply critical-developer-mindset skill with full research to analyze: [requirement]"
+Use the Agent tool with:
+- subagent_type: "general-purpose"   (or a local agent in ~/.claude/agents/)
+- prompt: "Apply the critical-developer-mindset skill with full research to analyze: [requirement]"
 ```
 
 ### Direct Skill Invocation
@@ -228,28 +205,37 @@ Then provide your requirement for analysis.
 
 ## MCP Tools Reference
 
-### Web Research
+### Documentation & the Web
 | Tool | Purpose |
 |------|---------|
-| `firecrawl_search` | Search web with rich results (preferred) |
-| `firecrawl_scrape` | Extract content from specific pages |
-| `WebSearch` | General web search fallback |
-| `WebFetch` | Fetch specific URLs |
+| `mcp__context7__resolve-library-id` | Map a package name to a Context7 library ID |
+| `mcp__context7__query-docs` | Version-correct docs for that library (preferred) |
+| `WebSearch` | General search when no library is involved |
+| `WebFetch` | Fetch one known URL |
 
 ### GitHub Research
-| Tool | Purpose |
-|------|---------|
-| `mcp__github__search_code` | Find implementations in open source |
-| `mcp__github__search_issues` | Find known bugs and workarounds |
-| `mcp__github__get_file_contents` | Read library source code |
-| `mcp__github__list_commits` | Check recent changes |
+No GitHub MCP server; use the `gh` CLI through `Bash`.
 
-### Memory
+| Command | Purpose |
+|---------|---------|
+| `gh search code` | Find implementations in open source |
+| `gh search issues` | Find known bugs and workarounds |
+| `gh api` | Read library source, releases, anything else |
+
+### Code Navigation (Serena)
 | Tool | Purpose |
 |------|---------|
-| `mcp__memory__create_entities` | Store research findings |
-| `mcp__memory__add_observations` | Add notes to entities |
-| `mcp__memory__search_nodes` | Recall previous research |
+| `mcp__serena__get_symbols_overview` | Shape of a file before reading it |
+| `mcp__serena__find_symbol` | Jump to a definition |
+| `mcp__serena__find_referencing_symbols` | Every caller — the EXPAND step |
+| `mcp__serena__get_diagnostics_for_file` | What the compiler already knows |
+
+### Memory (Serena)
+| Tool | Purpose |
+|------|---------|
+| `mcp__serena__write_memory` | Store a finding for this project |
+| `mcp__serena__read_memory` | Recall it in a later session |
+| `mcp__serena__list_memories` | See what is already recorded |
 
 ## Integration with Development Workflow
 

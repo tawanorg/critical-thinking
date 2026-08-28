@@ -101,90 +101,86 @@ digraph critical_thinking {
 
 ### Research Tools Available
 
-**Use these MCP tools and capabilities:**
+These are the tools actually installed. Anything not listed here does not exist
+in this setup, so do not reach for it.
 
-#### Web & Documentation Research
+#### Documentation and the Web
 | Tool | When to Use |
 |------|-------------|
-| `firecrawl_search` | Search web for docs, articles, best practices |
-| `firecrawl_scrape` | Extract content from official documentation |
-| `firecrawl_parse` | Parse local PDFs, Word docs, Excel files |
-| `WebFetch` / `WebSearch` | Fetch specific pages or general search |
+| `resolve-library-id` | Map a package name to a Context7 library ID |
+| `query-docs` | Version-correct docs and examples for that library |
+| `WebSearch` | General search, when no specific library is involved |
+| `WebFetch` | Read one known page: an RFC, a changelog, a status page |
 
-#### GitHub Research
+Context7 is the first stop for library documentation. It returns docs for the
+version you are actually on, which is what the source priority above demands
+and what a search engine cannot promise.
+
+#### Reading Code by Symbol (Serena)
+Navigate by symbol, not by grep. These run on a real language server.
+
 | Tool | When to Use |
 |------|-------------|
-| `mcp__github__search_code` | Find real-world implementations in open source |
-| `mcp__github__search_issues` | Find known bugs, edge cases, workarounds |
-| `mcp__github__get_file_contents` | Read source code of libraries you're using |
-| `mcp__github__list_commits` | Check recent changes in dependencies |
+| `get_symbols_overview` | The shape of a file before you read any of it |
+| `find_symbol` | Jump straight to a definition by name |
+| `find_referencing_symbols` | **Every caller of a symbol. This is step 4, EXPAND.** |
+| `find_implementations` | Concrete implementations of an interface |
+| `find_declaration` | Where a symbol is declared |
+| `get_diagnostics_for_file` | Errors and warnings the compiler already knows |
+| `get_diagnostics_for_symbol` | The same, narrowed to one symbol |
 
-#### Code Analysis (LSP) - Understand Existing Code
+#### Changing Code by Symbol (Serena)
 | Tool | When to Use |
 |------|-------------|
-| `lsp_diagnostics` | Find errors/warnings in a file |
-| `lsp_diagnostics_directory` | Project-wide error check |
-| `lsp_hover` | Get type info and documentation at a position |
-| `lsp_goto_definition` | Navigate to where something is defined |
-| `lsp_find_references` | Find all usages of a symbol |
-| `lsp_document_symbols` | Get file structure (functions, classes) |
-| `lsp_workspace_symbols` | Search symbols across entire project |
+| `replace_symbol_body` | Rewrite a function or class without counting lines |
+| `insert_before_symbol` / `insert_after_symbol` | Add code next to a symbol |
+| `rename_symbol` | Rename across the project through the language server |
+| `search_for_pattern` / `replace_in_files` | Regex across the tree, when no symbol fits |
 
-#### Structural Code Search (AST)
+#### Searching Text
 | Tool | When to Use |
 |------|-------------|
-| `ast_grep_search` | Find code patterns structurally (not just text) |
-| `ast_grep_replace` | Refactor patterns safely |
+| `Grep` | Fast literal or regex search |
+| `Glob` | Find files by name pattern |
+| `Read` | Read a file once you know which one |
 
-#### Complex Reasoning
+#### GitHub
+There is no GitHub MCP server here. Use the `gh` CLI through `Bash`:
+
+| Command | Finds |
+|---------|-------|
+| `gh search code` | Real-world implementations in open source |
+| `gh search issues`, `gh issue list` | Known bugs, edge cases, workarounds |
+| `gh release view`, `gh api repos/:owner/:repo/releases` | Breaking changes in a dependency |
+| `gh api` | Anything else in the REST or GraphQL API |
+
+#### Carrying Findings Across Sessions (Serena)
 | Tool | When to Use |
 |------|-------------|
-| `sequentialthinking` | Multi-step analysis with revision capability |
-| `python_repl` | Calculations, data analysis, prototyping |
+| `write_memory` | Record a decision or a gotcha for this project |
+| `read_memory`, `list_memories` | Recall what you worked out last time |
 
-#### Memory & Context
+#### Business Context (Google Workspace)
 | Tool | When to Use |
 |------|-------------|
-| `mcp__memory__*` | Store/recall research findings |
-| `project_memory_read/write` | Project-specific persistent context |
-| `project_memory_add_note` | Add categorized notes that persist |
-| `session_search` | Search prior sessions for relevant context |
+| `Gmail__search_threads`, `Gmail__get_thread` | The email thread behind the ticket |
+| `Google_Drive__search_files`, `Google_Drive__read_file_content` | Specs, sheets, contracts |
+| `Google_Calendar__list_events` | Deadlines, and who to ask before them |
 
-#### Browser Automation (For Live Testing)
-| Tool | When to Use |
-|------|-------------|
-| `firecrawl_interact` | Click, fill forms, test live behavior |
-| `firecrawl_agent` | Autonomous research across multiple sites |
-| `firecrawl_crawl` | Crawl entire documentation sites |
-| `firecrawl_extract` | Extract structured data with JSON schema |
-
-#### Google Workspace (Business Context)
-| Tool | When to Use |
-|------|-------------|
-| `Gmail__search_threads` | Find email discussions about the requirement |
-| `Gmail__get_thread` | Read full context of conversations |
-| `Google_Drive__read_file_content` | Read specs, docs, spreadsheets |
-| `Google_Drive__search_files` | Find relevant documentation |
-| `Google_Calendar__list_events` | Check deadlines, stakeholder availability |
-
-#### Filesystem Analysis
-| Tool | When to Use |
-|------|-------------|
-| `directory_tree` | Visualize project structure |
-| `read_multiple_files` | Read many files simultaneously |
-| `list_directory_with_sizes` | Find large files, analyze codebase |
+This is often where the real requirement lives. A ticket is usually a lossy
+summary of a conversation that happened somewhere else.
 
 ### Power Tools by Analysis Step
 
 | Step | Tools to Use | Purpose |
 |------|--------------|---------|
-| **1. QUESTION** | `lsp_document_symbols`, `ast_grep_search` | Understand existing code structure |
-| **2. RESEARCH** | `firecrawl_*`, `WebSearch`, `github_search_*` | Gather external knowledge |
-| **3. VALIDATE** | `sequentialthinking`, `python_repl` | Complex reasoning, data analysis |
-| **4. EXPAND** | `lsp_find_references`, `ast_grep_search` | Find all usages, ripple effects |
-| **5. SECURE** | `lsp_diagnostics`, `github_search_issues` | Find vulnerabilities, known issues |
-| **6. FUTURE** | `session_search`, `project_memory` | Learn from past decisions |
-| **7. IMPLEMENT** | All tools combined | Execute with full context |
+| **1. QUESTION** | `get_symbols_overview`, `find_symbol` | Learn the shape of what you are changing |
+| **2. RESEARCH** | `resolve-library-id` then `query-docs`, `gh search`, `WebFetch` | Gather external knowledge |
+| **3. VALIDATE** | `Gmail__search_threads`, `Google_Drive__search_files` | Find the intent behind the ticket |
+| **4. EXPAND** | `find_referencing_symbols`, `find_implementations` | Every caller, every ripple |
+| **5. SECURE** | `get_diagnostics_for_file`, `gh search issues` | Known defects and advisories |
+| **6. FUTURE** | `read_memory`, `list_memories` | What past-you already decided and why |
+| **7. IMPLEMENT** | `replace_symbol_body`, `rename_symbol`, `Edit` | Change code structurally, not textually |
 
 ### Research Checklist
 
